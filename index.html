@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="VoteSmart AI - Your personal election assistant helping you understand the voting process">
+  <title>VoteSmart AI – Election Assistant</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header role="banner" class="header">
+    <div class="container">
+      <h1 class="header__title">VoteSmart AI</h1>
+      <p class="header__subtitle">Election Assistant – Understanding Your Voting Rights</p>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main role="main" class="main">
+    <div class="container">
+      
+      <!-- User Input Section -->
+      <section aria-label="Voter Information Form" class="section card">
+        <h2 class="section__title">Your Voter Profile</h2>
+        <p class="section__description">Tell us about yourself to get personalized voting information.</p>
+        
+        <form id="voterForm" class="form" novalidate>
+          <!-- Age Input -->
+          <div class="form__group">
+            <label for="ageInput" class="form__label">Age (Required)</label>
+            <input
+              type="number"
+              id="ageInput"
+              class="form__input"
+              placeholder="Enter your age"
+              min="0"
+              max="120"
+              required
+              aria-required="true"
+              aria-describedby="ageError"
+            >
+            <span id="ageError" class="form__error" role="alert"></span>
+          </div>
+
+          <!-- State Input -->
+          <div class="form__group">
+            <label for="stateInput" class="form__label">State (Required)</label>
+            <input
+              type="text"
+              id="stateInput"
+              class="form__input"
+              placeholder="e.g., California, Texas, New York"
+              required
+              aria-required="true"
+              aria-describedby="stateError"
+            >
+            <span id="stateError" class="form__error" role="alert"></span>
+          </div>
+
+          <!-- First-Time Voter Dropdown -->
+          <div class="form__group">
+            <label for="firstTimeVoter" class="form__label">First-Time Voter? (Required)</label>
+            <select
+              id="firstTimeVoter"
+              class="form__input form__select"
+              required
+              aria-required="true"
+              aria-describedby="voterStatusError"
+            >
+              <option value="">Select an option</option>
+              <option value="yes">Yes, this is my first time voting</option>
+              <option value="no">No, I've voted before</option>
+            </select>
+            <span id="voterStatusError" class="form__error" role="alert"></span>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="form__button" aria-label="Submit voter information">
+            Get My Voting Guide
+          </button>
+        </form>
+      </section>
+
+      <!-- Voter Eligibility Status -->
+      <section id="eligibilitySection" aria-label="Voter Eligibility Status" class="section card hidden">
+        <div id="eligibilityContainer" class="eligibility">
+          <!-- Eligibility status will be dynamically rendered here -->
+        </div>
+      </section>
+
+      <!-- Chat Assistant -->
+      <section aria-label="Chat Assistant" class="section card">
+        <h2 class="section__title">Chat Assistant</h2>
+        <p class="section__description">Ask common questions about voting:</p>
+        
+        <div class="chat-container">
+          <!-- Chat messages will be rendered here -->
+          <div id="chatMessages" class="chat__messages" role="log" aria-label="Chat messages"></div>
+          
+          <!-- Chat input -->
+          <div class="chat__input-wrapper">
+            <input
+              type="text"
+              id="chatInput"
+              class="chat__input"
+              placeholder="Ask a question... (e.g., 'What do I need to bring?')"
+              aria-label="Chat input"
+              autocomplete="off"
+            >
+            <button
+              type="button"
+              id="chatSendBtn"
+              class="chat__send-btn"
+              aria-label="Send chat message"
+            >
+              Send
+            </button>
+          </div>
+
+          <!-- Suggested questions -->
+          <div class="chat__suggestions">
+            <p class="chat__suggestions-label">Popular questions:</p>
+            <div class="chat__buttons">
+              <button type="button" class="chat__suggestion-btn" data-question="What documents do I need?">
+                Documents Needed
+              </button>
+              <button type="button" class="chat__suggestion-btn" data-question="Where can I vote?">
+                Voting Locations
+              </button>
+              <button type="button" class="chat__suggestion-btn" data-question="Can I vote early?">
+                Early Voting
+              </button>
+              <button type="button" class="chat__suggestion-btn" data-question="What is voter registration?">
+                Voter Registration
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Personalized Voting Guide -->
+      <section id="guideSection" aria-label="Personalized Voting Guide" class="section card hidden">
+        <h2 class="section__title">Your Personalized Voting Guide</h2>
+        <p class="section__description">Here's your step-by-step guide based on your profile:</p>
+        
+        <div id="guideContainer" class="guide">
+          <!-- Guide steps will be dynamically rendered here -->
+        </div>
+      </section>
+
+      <!-- Election Timeline -->
+      <section aria-label="Election Timeline and Dates" class="section card">
+        <h2 class="section__title">Important Election Dates</h2>
+        <p class="section__description">Mark these dates on your calendar:</p>
+        
+        <div id="timelineContainer" class="timeline">
+          <!-- Timeline events will be dynamically rendered here -->
+        </div>
+      </section>
+
+      <!-- Document Checklist -->
+      <section id="checklistSection" aria-label="Required Documents Checklist" class="section card hidden">
+        <h2 class="section__title">Document Checklist</h2>
+        <p class="section__description">Make sure you have all necessary documents before election day:</p>
+        
+        <div id="checklistContainer" class="checklist">
+          <!-- Checklist items will be dynamically rendered here -->
+        </div>
+      </section>
+
+      <!-- Reset Button -->
+      <div class="section card">
+        <button
+          type="button"
+          id="resetBtn"
+          class="button button--secondary"
+          aria-label="Clear form and start over"
+        >
+          Clear Form & Start Over
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer role="contentinfo" class="footer">
+    <div class="container">
+      <p class="footer__text">
+        &copy; 2026 VoteSmart AI. Educational purposes only. 
+        <span class="footer__divider">|</span>
+        For official voting information, visit your state's election office.
+      </p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
