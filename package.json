@@ -1,0 +1,13 @@
+{
+  "name": "votesmart-ai",
+  "version": "1.0.0",
+  "description": "VoteSmart AI - Election Assistant",
+  "main": "script.js",
+  "scripts": {
+    "test": "jest --env=jsdom --coverage"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  }
+}

@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * VoteSmart AI – Election Assistant
  * Main JavaScript Module
@@ -7,6 +9,10 @@
 // ============================================
 // 1. STATE & DATA STRUCTURES
 // ============================================
+
+// Add your Google Gemini API Key here for the chat assistant
+// Get an API key from Google AI Studio (https://aistudio.google.com/)
+window.GEMINI_API_KEY = '';
 
 // User state object - stores current voter information
 const userState = {
@@ -260,7 +266,7 @@ const DOM = {
 function validateAge(age) {
   const ageNum = parseInt(age, 10);
 
-  if (!age || age === '') {
+  if (age === null || age === undefined || age === '') {
     return { isValid: false, error: 'Age is required.' };
   }
 
@@ -690,8 +696,9 @@ function addChatMessage(message, sender) {
 
 /**
  * Handle chat message submission
+ * Uses Google Gemini API if configured, otherwise falls back to local knowledge base
  */
-function handleChatSubmit() {
+async function handleChatSubmit() {
   const message = DOM.chatInput.value.trim();
 
   if (!message) {
@@ -701,15 +708,64 @@ function handleChatSubmit() {
   // Add user message
   addChatMessage(message, 'user');
 
-  // Find and add assistant response
+  // Clear input
+  DOM.chatInput.value = '';
+  DOM.chatInput.focus();
+
+  // Check if Gemini API key is configured (look for it in a global variable or constant)
+  // To use Gemini, set window.GEMINI_API_KEY = "your_key" in the console or define it here
+  const apiKey = window.GEMINI_API_KEY || ''; 
+
+  if (apiKey) {
+    try {
+      // Show loading indicator
+      const loadingId = 'loading-' + Date.now();
+      addChatMessage('Thinking...', 'assistant');
+      const lastMessage = DOM.chatMessages.lastElementChild;
+      lastMessage.id = loadingId;
+
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `You are VoteSmart AI, an election assistant helping users understand the voting process in the US. Keep answers concise, helpful, and objective. User asks: ${message}`
+            }]
+          }]
+        })
+      });
+
+      // Remove loading indicator
+      const loadingElement = document.getElementById(loadingId);
+      if (loadingElement) loadingElement.remove();
+
+      if (response.ok) {
+        const data = await response.json();
+        const answer = data.candidates[0].content.parts[0].text;
+        addChatMessage(answer, 'assistant');
+        return;
+      } else {
+        console.error('Gemini API Error:', response.status);
+      }
+    } catch (error) {
+      console.error('Gemini API Fetch Error:', error);
+      // Remove loading indicator if it exists
+      const lastMessage = DOM.chatMessages.lastElementChild;
+      if (lastMessage && lastMessage.textContent === 'Thinking...') {
+        lastMessage.remove();
+      }
+    }
+  }
+
+  // Fallback to local knowledge base
   const answer = findAnswer(message);
   setTimeout(() => {
     addChatMessage(answer, 'assistant');
   }, 300);
-
-  // Clear input
-  DOM.chatInput.value = '';
-  DOM.chatInput.focus();
 }
 
 /**
@@ -969,8 +1025,10 @@ function initializeApp() {
 
 // Start the app when DOM is ready
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeApp);
-} else {
+  document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('voterForm')) initializeApp();
+  });
+} else if (document.getElementById('voterForm')) {
   initializeApp();
 }
 
@@ -984,3 +1042,14 @@ window.testAgeValidation = testAgeValidation;
 window.testStateValidation = testStateValidation;
 window.testChatFunctionality = testChatFunctionality;
 window.testChecklistLogic = testChecklistLogic;
+
+// Export for Node.js testing
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    validateAge,
+    validateState,
+    validateFirstTimeVoter,
+    findAnswer,
+    normalizeQuestion
+  };
+}
